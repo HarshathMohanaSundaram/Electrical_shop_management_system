@@ -1,0 +1,44 @@
+.supplierPurchase{
+    display: flex;
+    width: 100%;
+    .supplierPurchaseContainer{
+        flex: 6;
+        .top, .bottom{
+            -webkit-box-shadow: 2px 4px 10px 1px rgba(0,0,0,0.47);
+            box-shadow: 2px 4px 10px 1px rgba(201,201,201,0.47);
+            padding: 10px;
+            margin: 20px;
+        }
+        h1{
+            color: lightgray;
+            font-size: 20px;
+        }
+        .bottom{
+            form{
+                align-items: center;
+            }
+
+            h2{
+                font-weight: bold;
+                font-size: 18px;
+            }
+
+            input{
+                border: none;
+            }
+            input:focus{
+                outline: none;
+            }
+            .btn{
+                margin-top: 10px;
+                padding: 2px 5px;
+                border-radius: 5px;
+                width: max-content;
+                background-color: green;
+                color: white;
+                border: 1px dotted rgba(43, 220, 20, 0.6);
+                cursor: pointer;
+            }
+        }
+    }
+}

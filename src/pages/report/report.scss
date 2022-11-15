@@ -1,0 +1,38 @@
+.report{
+    display: flex;
+    width: 100%;
+    .reportContainer{
+        flex: 6;
+
+        .form{
+            .formInput{
+                margin-left: 30px;
+            }
+            label{
+                font-size: 14px;
+                font-weight: bold;
+            }
+            input{
+                padding: 10px;
+                margin: 10px 20px;
+                border: 1px solid black;
+                border-radius: 50px;
+                width: 30%;
+            }
+            input:focus{
+                outline: none;
+            }
+            .btn{
+                margin: 10px;
+                padding: 5px;
+                border-radius: 10px;
+                width: 75px;
+                border:none;
+                background-color:rgba(118, 56, 177, 0.899);
+                color:#fff;
+                font-size: 14px;
+            }
+        }
+
+    }
+}

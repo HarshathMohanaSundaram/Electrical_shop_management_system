@@ -1,0 +1,32 @@
+.salesReport{
+    -webkit-box-shadow: 2px 4px 10px 1px rgba(0,0,0,0.47);
+    box-shadow: 2px 4px 10px 1px rgba(201,201,201,0.47);
+    padding: 10px;
+    margin: 20px;
+    
+    .reportTable{
+        height: 600px;
+        padding: 20px;
+
+        .cellWithImg{
+            display: flex;
+            align-items: center;
+    
+            .cellImg{
+                width: 32px;
+                height: 32px;
+                border-radius: 50%;
+                object-fit: cover;
+                margin-right: 20px;
+            }
+        }
+    }
+
+    .viewButton{
+        padding: 2px 5px;
+        border-radius: 5px;
+        color: darkblue;
+        border: 1px dotted rgba(0, 0, 139, 0.596);
+        cursor: pointer;
+    }
+}

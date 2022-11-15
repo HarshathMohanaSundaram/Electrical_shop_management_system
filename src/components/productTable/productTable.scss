@@ -1,0 +1,25 @@
+.producttable{
+    height: 600px;
+    padding: 20px;
+
+    .producttableTitle{
+        width: 100%;
+        font-size: 24px;
+        color: gray;
+        margin-bottom: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between; 
+    }
+
+    .nextButton{
+        margin-top: 10px;
+        padding: 2px 5px;
+        border-radius: 5px;
+        width: max-content;
+        background-color: green;
+        color: white;
+        border: 1px dotted rgba(43, 220, 20, 0.6);
+        cursor: pointer;
+    }
+}    
