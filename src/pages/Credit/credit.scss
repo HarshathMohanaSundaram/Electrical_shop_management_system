@@ -1,0 +1,33 @@
+.credit{
+    display: flex;
+    width: 100%;
+
+    .creditContainer{
+        flex: 6;
+        .creditTitle{
+            font-size: 24px;
+            color: gray;
+            margin: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between; 
+        }
+
+        .datatable{
+            height: 600px;
+            .status{
+                padding: 5px;
+                border-radius: 5px;
+        
+                &.Closed{
+                    color: green;
+                    background-color: rgba(0, 128, 0, 0.151);
+                }
+                &.Pending{
+                    color: goldenrod;
+                    background-color: rgba(189, 189, 3, 0.103);
+                }
+            }
+        }
+    }
+}

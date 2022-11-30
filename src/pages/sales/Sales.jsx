@@ -8,11 +8,9 @@ import { useNavigate } from "react-router-dom";
 import SalesForm from "../../components/salesForm/SalesForm";
 import Tabs from '@mui/material/Tabs';
 import Tab from '@mui/material/Tab';
-import Datatable from "../../components/datatable/Datatable";
-import {salesColumn} from "../../datatablesource";
 import Navbar from "../../components/navbar/Navbar";
-import { sales } from "../../data";
 import axios from "axios";
+import SalesTable from "../../components/salesTable/SalesTable";
 
 
 
@@ -24,7 +22,6 @@ const Sales = ({customer, categories, products}) => {
     const [tab, setTab] = useState(0);
     const [amountGiven , setAmount] = useState(0)
     const [balance, setBalance] = useState(0)
-    const [bill_id, setBillId] = useState(0);
     let handleChange = (e) => {
         if(e.target.value==="")
             return
@@ -111,17 +108,16 @@ const Sales = ({customer, categories, products}) => {
             console.log(formValues);
             axios.post("http://localhost:5000/sales/add",{
                 customerId,
-                today,
                 total,
                 balance,
-                formValues
+                formValues,
+                amountGiven
             }).then((results)=>{
-                setBillId(results.data[0].invoiceId)
+                setTimeout(()=>navigate('/sales/invoice',{state: {Customer:{customerName}, product:{formValues}, total:{total}, date:{today}, invoice:results.data[0].invoiceId}}),500)
             })
             .catch((err)=>{
                 toast.error(err.response.data);
             })
-            navigate('/sales/invoice',{state: {Customer:{customerName}, product:{formValues}, total:{total}, date:{today}, invoice:{bill_id}}})
         }
     }
 
@@ -172,7 +168,7 @@ const Sales = ({customer, categories, products}) => {
             }
             {
                 tab === 1 && 
-                <Datatable page = "Product" row={sales} column={salesColumn} />
+                <SalesTable />
             }
         </div>
     </div>

@@ -18,6 +18,8 @@ import { customerColumns, productColumns, supplierColumns } from "./datatablesou
 import axios from "axios";
 import Report from "./pages/report/Report";
 import React from 'react'
+import Credit from "./pages/Credit/Credit";
+import SupplierReturn from "./pages/supplierReturn/SupplierReturn";
 
 
 
@@ -94,9 +96,11 @@ function App() {
               <Route path='product/:supplierId' element={<SupplierProduct products = {products} supplier={suppliers} loadData={loadProduct}/>}/>
               <Route path='purchase/:supplierId' element = {<SupplierPurchase />} />
               <Route path="new" element={<New inputs={userInputs} type="supplier" title="Supplier"/>}/>
+              <Route path="returnData/:supplierId" element={<SupplierReturn />}/>
             </Route>
             <Route path = "report" element={<Report />} />
             <Route path = "notification" element={<Notifications />} />
+            <Route path = "credit" element={<Credit />} />
           </Route>
         </Routes>
       </BrowserRouter>

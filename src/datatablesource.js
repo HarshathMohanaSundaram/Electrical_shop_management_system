@@ -75,7 +75,7 @@ export const supplierColumns=[
     {
         field: 'balance',
         headerName: 'Balance',
-        width:180,
+        width:150,
         type:Number
     }
 ]
@@ -114,6 +114,13 @@ export const salesColumn = [
         field:'sales_type',
         headerName:'Status',
         width:150,
+        renderCell:(params) =>{
+            return(
+                <div className={`status ${params.row.sales_type}`}>
+                    {params.row.sales_type}
+                </div>
+            )
+        }
     },
     {
         field: 'balance',
@@ -148,4 +155,50 @@ export const purchaseColumns=[
         width:180,
         type:Number
     },
+]
+
+export const creditColumns = [
+    {
+        field:"bill_id", headerName:"Invoice", width:70
+    },
+    {
+        field:"customerName", 
+        headerName:"Customer", 
+        width: 230, 
+        renderCell:(params)=>{
+            return(
+                <div className='cellWithImg'>
+                    <img src="https://static.vecteezy.com/system/resources/thumbnails/000/439/863/small/Basic_Ui__28186_29.jpg" alt="" className='cellImg' />
+                    <span>{params.row.customerName}</span>
+                </div>
+            )
+        } 
+    },
+    {
+        field:"date",
+        headerName:"Date",
+        width:180,
+    },
+    {
+        field:"sales_amount",
+        headerName:"Sales Amount",
+        width:180
+    },
+    {
+        field:'salesStatus',
+        headerName:'Status',
+        renderCell:(params) =>{
+            return(
+                <div className={`status ${params.row.salesStaus}`}>
+                    {params.row.sales_type}
+                </div>
+            )
+        }
+    },
+    {
+        field: 'balance',
+        headerName:'Balance',
+        width:150,
+        type:Number
+    }    
 ]

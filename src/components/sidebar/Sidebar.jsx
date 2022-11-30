@@ -82,15 +82,16 @@ const Sidebar = () => {
                         </span>
                     </li>
                 </Link>
-                
+                <Link to="/credit" style={{textDecoration:'none'}}>
                 <li>
                     <CreditCardIcon className='icon'/>
                     <span>
                         Credit
                     </span>
                 </li>
+                </Link>
                 <p className="title">USEFUL</p>
-                <Link to = "/report">
+                <Link to = "/report" style={{textDecoration:'none'}}>
                     <li>
                         <AssessmentRoundedIcon className='icon'/>
                         <span>
@@ -98,7 +99,7 @@ const Sidebar = () => {
                         </span>
                     </li>
                 </Link>
-                <Link to="/notification" state={{product:counter}}>
+                <Link to="/notification" state={{product:counter}} style={{textDecoration:'none'}}>
                     <li>
                         <NotificationsRoundedIcon className='icon'/>
                         <span>

@@ -13,6 +13,9 @@ const Invoice = () => {
   console.log(product);
   console.log(total);
   console.log(date);
+  console.log('====================================');
+  console.log(invoice);
+  console.log('====================================');
   const componentRef = useRef()
   return (
     <div className='invoice'>
@@ -49,7 +52,7 @@ const Invoice = () => {
                   </div>
                   <article className="mt-10 mb-14 flex items-end justify-end">
                     <ul>
-                      <li className='p-1'><span className="font-bold">Invoice number:</span>{invoice.bill_id}</li>
+                      <li className='p-1'><span className="font-bold">Invoice number:</span>{invoice}</li>
                       <li className='p-1 bg-gray-100'><span className="font-bold">Invoice date:</span>{date.today}</li>
                     </ul>
                   </article>

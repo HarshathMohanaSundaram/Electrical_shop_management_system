@@ -112,8 +112,8 @@ app.delete("/remove/product/:id",(req,res) =>{
 app.post("/purchase/add",(req,res) =>{
     console.log("Purchase Products");
     const{list, stotal, supplierId, today, balance} = req.body;
-    const sqlInsert = "INSERT INTO tbl_supplier_purchase(supplier_id,date,total) VALUES (?,?,?)";
-    db.query(sqlInsert,[supplierId,today,stotal],(error,result)=>{
+    const sqlInsert = "INSERT INTO tbl_supplier_purchase(supplier_id,date,total) VALUES (?,CURDATE(),?)";
+    db.query(sqlInsert,[supplierId,stotal],(error,result)=>{
         if(error){
             console.log(error);
         }
@@ -141,11 +141,11 @@ app.post("/purchase/add",(req,res) =>{
 })
 
 app.post("/sales/add",(req,res)=>{
-    const {customerId, today, total, balance, formValues} = req.body
+    const {customerId, total, balance, formValues, amountGiven} = req.body
     const salesType = (balance>0)?"Credit":"Cash";
     const status = (salesType=="Credit")?"Pending":"Closed";
-    const sqlInsert = "INSERT INTO tbl_sales(customer_id, date, sales_amount, sales_type, balance, salesStatus) VALUES (?,?,?,?,?,?)";
-    db.query(sqlInsert,[customerId,today,total,salesType,balance,status],(err,result)=>{
+    const sqlInsert = "INSERT INTO tbl_sales(customer_id, date, sales_amount, amountGiven, sales_type, balance, salesStatus) VALUES (?,CURDATE(),?,?,?,?,?)";
+    db.query(sqlInsert,[customerId,total,salesType,amountGiven,balance,status],(err,result)=>{
         if(err)
             console.log(err)
         const bill_id = result.insertId;
@@ -237,7 +237,7 @@ app.get("/last5Sales",(req,res) =>{
 
 app.get("/customer/:id",(req,res)=>{
     const {id} = req.params;
-    const sqlGet = "SELECT * from tbl_customer WHERE customer_id = ?"
+    const sqlGet = "SELECT customer_id as id, customerName as name, customerMobile as mobile, customerAddress as address from tbl_customer WHERE customer_id = ?"
     db.query(sqlGet,id,(err,result)=>{
         if(err)
             console.log(err)
@@ -247,7 +247,7 @@ app.get("/customer/:id",(req,res)=>{
 
 app.get("/product/:id",(req,res)=>{
     const {id} = req.params;
-    const sqlGet = "SELECT * from tbl_product WHERE product_id = ?"
+    const sqlGet = "SELECT productName as name, tbl_category.cat_name,tbl_supplier.supplierName, stock,minStock FROM tbl_product INNER JOIN tbl_category ON tbl_product.cat_id = tbl_product.cat_id INNER JOIN tbl_supplier ON tbl_product.supplier_id = tbl_supplier.supplier_id WHERE product_id = ? GROUP BY product_id"
     db.query(sqlGet,id,(err,result)=>{
         if(err)
             console.log(err)
@@ -256,8 +256,71 @@ app.get("/product/:id",(req,res)=>{
 })
 app.get("/supplier/:id",(req,res)=>{
     const {id} = req.params;
-    const sqlGet = "SELECT * from tbl_supplier WHERE supplier_id = ?"
+    const sqlGet = "SELECT supplier_id as id,supplierName as name,supplierMobile as mobile, supplierAddress as address from tbl_supplier WHERE supplier_id = ?"
     db.query(sqlGet,id,(err,result)=>{
+        if(err)
+            console.log(err)
+        res.send(result)
+    })
+})
+
+app.get("/sales/details/:id",(req,res)=>{
+    const {id} = req.params;
+    const sqlGet = "SELECT DATE_FORMAT(date,'%M') AS name,SUM(sales_amount) AS Total FROM tbl_sales WHERE date >= date_sub(now(), interval 6 month) AND customer_id=? GROUP BY DATE_FORMAT(date,'%M')"
+    db.query(sqlGet,id,(err,result)=>{
+        if(err)
+            console.log(err)
+        res.send(result)
+    })
+})
+
+app.get("/purchase/details/:id",(req,res)=>{
+    const {id} = req.params;
+    const sqlGet = "SELECT DATE_FORMAT(date,'%M') AS name,SUM(total) AS Total FROM tbl_supplier_purchase WHERE date >= date_sub(now(), interval 6 month) AND supplier_id=? GROUP BY DATE_FORMAT(date,'%M')"
+    db.query(sqlGet,id,(err,result)=>{
+        if(err)
+            console.log(err)
+        res.send(result)
+    })
+})
+
+app.get("/credit/details",(req,res)=>{
+    const sqlGet = "SELECT tbl_sales.bill_id,tbl_customer.customerName, tbl_sales.date, tbl_sales.sales_amount, tbl_sales.sales_type, tbl_sales.balance, tbl_sales.salesStatus  FROM electric_shop.tbl_sales INNER JOIN electric_shop.tbl_customer ON electric_shop.tbl_sales.customer_id = tbl_customer.customer_id WHERE sales_type='Credit' AND salesStatus ='Pending'"
+    db.query(sqlGet,(err,result)=>{
+        if(err)
+            console.log(err)
+            res.send(result)
+    })
+})
+
+app.post("/update/supplierBalance",(req,res)=>{
+    const {id,balance,amountGiven,remaining} = req.body;
+    const sqlPost = "INSERT INTO tbl_supplier_balance (supplier_id, date, beforePay, amountGiven, afterPay) VALUES (?,CURDATE(),?,?,?)";
+    db.query(sqlPost,[id,balance,amountGiven,remaining],(err,result)=>{
+        if(err)
+            console.log(err)
+        const sqlUpdate = "UPDATE tbl_supplier SET balance = ? where supplier_id = ?";
+        db.query(sqlUpdate,[remaining,id],(err,result)=>{
+            if(err)
+                console.log(err)
+        })
+    })
+})
+
+app.get("/get/supplierBalance/:id",(req,res)=>{
+    const {id} = req.params;
+    const sqlGet = "SELECT * FROM tbl_supplier_balance WHERE supplier_id=?";
+    db.query(sqlGet,id,(err,result)=>{
+        if(err)
+            console.log(err)
+        res.send(result)
+
+    })
+})
+
+app.get("/get/salesDetails",(req,res)=>{
+    const sqlGet = "SELECT tbl_sales.bill_id, tbl_customer.customerName, tbl_sales.date,tbl_sales.sales_amount,tbl_sales.sales_type,tbl_sales.balance FROM tbl_sales INNER JOIN tbl_customer ON tbl_sales.customer_id = tbl_customer.customer_id"
+    db.query(sqlGet,(err,result)=>{
         if(err)
             console.log(err)
         res.send(result)

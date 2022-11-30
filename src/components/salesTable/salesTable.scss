@@ -1,0 +1,66 @@
+.datatable{
+    height: 600px;
+    padding: 20px;
+
+    .cellWithImg{
+        display: flex;
+        align-items: center;
+
+        .cellImg{
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-right: 20px;
+        }
+    } 
+    .status{
+        padding: 5px;
+        border-radius: 5px;
+        &.Cash{
+            color: green;
+            background-color: rgba(0, 128, 0, 0.151);
+        }
+        &.Credit{
+            color: goldenrod;
+            background-color: rgba(189, 189, 3, 0.103);
+        }
+    }
+}
+.datatableTitle{
+    font-size: 24px;
+    color: gray;
+    margin: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between; 
+}
+
+.cellAction{
+    display: flex;
+    align-items: center;
+    gap:15px;
+
+    .viewButton{
+        padding: 2px 5px;
+        border-radius: 5px;
+        color: darkblue;
+        border: 1px dotted rgba(0, 0, 139, 0.596);
+        cursor: pointer;
+    }
+    .returnButton{
+        padding: 2px 5px;
+        border-radius: 5px;
+        color: crimson;
+        border: 1px dotted rgba(220, 20, 60, 0.6);
+        cursor: pointer;
+    }
+    .editButton{
+        padding: 2px 5px;
+        border-radius: 5px;
+        color: green;
+        border: 1px dotted rgba(43, 220, 20, 0.6);
+        cursor: pointer;
+    }
+}
+

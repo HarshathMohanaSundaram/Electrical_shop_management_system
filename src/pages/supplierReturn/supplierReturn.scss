@@ -1,0 +1,11 @@
+.supplierReturn{
+    display: flex;
+    width: 100%;
+    .supplierReturnContainer{
+        flex: 6;
+        .datatable{
+            height: 600px;
+            padding: 20px;
+        }
+    }
+}
