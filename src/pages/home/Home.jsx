@@ -1,5 +1,5 @@
 import React from 'react'
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 import Chart from '../../components/chart/Chart'
 import Navbar from '../../components/navbar/Navbar'
 import Sidebar from '../../components/sidebar/Sidebar'
@@ -10,35 +10,57 @@ import axios from 'axios'
 import PersonOutlinedIcon from "@mui/icons-material/PersonOutlined"
 import InventoryRoundedIcon from '@mui/icons-material/InventoryRounded';
 import PortraitIcon from '@mui/icons-material/Portrait';
+import { useNavigate } from 'react-router-dom'
 
 const Home = () => {
-
+ const navigate = useNavigate()
+  const [data,setData] = useState([])
   const [salesData, setSalesData] = useState([])
   const [purchaseData, setPurchaseData] = useState([])
 
-  const loadPurchaseData = async () =>{
+  const loadLastSalesData =(useCallback(async()=>{
+    const response = await axios.get("http://localhost:5000/last5Sales")
+    for(let i=0;i<response.data.length;i++){
+      response.data[i].date = response.data[i].date.split("T1")[0];
+    }
+    setData(response.data);
+  },[setData]))
+
+  const loadPurchaseData = ( useCallback(async () =>{
     const response = await axios.get("http://localhost:5000/purchase/details");
     for(let i = 0;i<response.data.length;i++){
       response.data[i].Total = parseFloat(response.data[i].Total).toFixed(2);
     }
     setPurchaseData(response.data);
-  }
+  },[setPurchaseData]))
 
-  const loadSalesData = async () =>{
+  const loadSalesData =( useCallback( async () =>{
     const response = await axios.get("http://localhost:5000/sales/details");
     for(let i = 0;i<response.data.length;i++){
       response.data[i].Total = parseFloat(response.data[i].Total).toFixed(2);
     }
     setSalesData(response.data);
-  }
+  },[setSalesData]))
+
+  useEffect(()=>{
+    const user = localStorage.getItem("user")
+    console.log(user);
+    if(user === null)
+      navigate("/login")
+  })
+
 
   useEffect(()=>{
     loadSalesData();
-  },[])
+  },[loadSalesData])
 
   useEffect(()=>{
     loadPurchaseData();
-  },[])
+  },[loadPurchaseData])
+
+  useEffect(()=>{
+    loadLastSalesData();
+  },[loadLastSalesData])
 
   return (
     <div className='home'>
@@ -71,7 +93,7 @@ const Home = () => {
           </div>
           <div className="listContainer">
             <div className="listTitle">Latest Transactions</div>
-            <List />
+            <List data={data} />
           </div>
         </div>
     </div>

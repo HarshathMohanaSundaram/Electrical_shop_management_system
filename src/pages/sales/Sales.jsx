@@ -113,7 +113,7 @@ const Sales = ({customer, categories, products}) => {
                 formValues,
                 amountGiven
             }).then((results)=>{
-                setTimeout(()=>navigate('/sales/invoice',{state: {Customer:{customerName}, product:{formValues}, total:{total}, date:{today}, invoice:results.data[0].invoiceId}}),500)
+                navigate('/sales/invoice',{state: {Customer:{customerName}, product:{formValues}, total:{total}, date:{today}, invoice:results.data[0].invoiceId}})
             })
             .catch((err)=>{
                 toast.error(err.response.data);

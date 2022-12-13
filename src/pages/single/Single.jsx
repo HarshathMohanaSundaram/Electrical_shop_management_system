@@ -2,7 +2,6 @@ import './single.scss'
 import Sidebar from '../../components/sidebar/Sidebar'
 import Navbar from '../../components/navbar/Navbar'
 import Chart from '../../components/chart/Chart'
-import List from '../../components/table/Table'
 import { useLocation } from "react-router-dom"
 import React, { useCallback, useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
@@ -17,6 +16,7 @@ const Single = () => {
     console.log("Id: "+ id+ " Path: "+path)
     const [data,setdata] = useState({})
     const [chart, setChart] = useState();
+    const [salesData,setSalesData] = useState([]);
 
     const loadData = useCallback(async () =>{
         if(path ==='Customer'){
@@ -24,6 +24,8 @@ const Single = () => {
             setdata(response.data[0])
             const salesresponse = await axios.get(`http://localhost:5000/sales/details/${id}`)
             setChart(salesresponse.data);
+            const lastSales = await axios.get(`http://localhost:5000/last5Sales/${id}`)
+            setSalesData(lastSales.data)
         }
         else if(path==='Supplier'){
             const response = await axios.get(`http://localhost:5000/supplier/${id}`);
@@ -35,13 +37,15 @@ const Single = () => {
             const response = await axios.get(`http://localhost:5000/product/${id}`);
             setdata(response.data[0])
         }
-    },[path,setdata,id])
+    },[path,setdata,id,setSalesData])
 
     useEffect(()=>{
         loadData();
     },[loadData])
     console.log(data);
     console.log(chart);
+    console.log("Sales Data");
+    console.log(salesData)
 
     return ( 
         <div className='single'>
@@ -101,11 +105,11 @@ const Single = () => {
                         <Chart aspect = { 2 / 1} title="User Buying (Last 6 Months)" data={chart}/>
                     </div>
                 </div>
-                <div className="bottom">
+                {/* <div className="bottom">
                 <h1 className="title">Last Transactions</h1>
-                    <List />
-                </div>
-            </div>
+                   {path ==='Customer' && <List data={setSalesData}/>} 
+                            </div>*/}
+            </div> 
         </div>
      );
 }

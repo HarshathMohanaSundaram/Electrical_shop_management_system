@@ -202,3 +202,21 @@ export const creditColumns = [
         type:Number
     }    
 ]
+
+export const returnColumns=[
+    { field: 'date', headerName: 'Date', width: 150 },
+    {  field: 'beforePay', 
+        headerName: 'Balance',
+        width: 130,  
+    },
+    { 
+        field : 'amountGiven',
+        headerName:'Amount Given',
+        width: 130,
+    },
+    {
+        field: 'afterPay',
+        headerName: 'Remaining',
+        width:130
+    },
+  ]

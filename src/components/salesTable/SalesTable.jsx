@@ -3,6 +3,7 @@ import axios from 'axios'
 import React, { useCallback, useEffect, useState } from 'react'
 import { salesColumn } from '../../datatablesource'
 import './salesTable.scss'
+import { Link } from 'react-router-dom'
 
 const SalesTable = () => {
   const[data,setData] = useState([])
@@ -22,8 +23,9 @@ const SalesTable = () => {
         return(
             <div className="cellAction">
                 <div className="viewButton">View</div>
-                <div className="editButton">Edit</div>
-                <div className="returnButton">Return</div>
+                <Link to={`/sales/return/${params.row.bill_id}`} state={{sales:params.row}}>
+                  <div className="returnButton">Return</div>
+                </Link>
             </div> 
         )
     }}

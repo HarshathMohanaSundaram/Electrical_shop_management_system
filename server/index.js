@@ -144,8 +144,8 @@ app.post("/sales/add",(req,res)=>{
     const {customerId, total, balance, formValues, amountGiven} = req.body
     const salesType = (balance>0)?"Credit":"Cash";
     const status = (salesType=="Credit")?"Pending":"Closed";
-    const sqlInsert = "INSERT INTO tbl_sales(customer_id, date, sales_amount, amountGiven, sales_type, balance, salesStatus) VALUES (?,CURDATE(),?,?,?,?,?)";
-    db.query(sqlInsert,[customerId,total,salesType,amountGiven,balance,status],(err,result)=>{
+    const sqlInsert = "INSERT INTO tbl_sales(customer_id, date, sales_amount, sales_type, amountGiven, balance, salesStatus) VALUES (?,CURDATE(),?,?,?,?,?)";
+    db.query(sqlInsert,[customerId,total,salesType,parseFloat(amountGiven),parseFloat(balance),status],(err,result)=>{
         if(err)
             console.log(err)
         const bill_id = result.insertId;
@@ -159,6 +159,13 @@ app.post("/sales/add",(req,res)=>{
             const stock = formValues[i].stock - qty;
             const sqlUpdate = "UPDATE tbl_product SET stock = ? WHERE product_id = ?"
             db.query(sqlUpdate,[stock,formValues[i].product_id],(err,result)=>{
+                if(err)
+                    console.log(err)
+            })
+        }
+        if(balance > 0){
+            const sqlBalance = "INSERT INTO tbl_credit_return(bill_id,date,beforePay,amountGiven,afterPay) VALUES(?,CURDATE(),?,?,?)";
+            db.query(sqlBalance,[bill_id,total,parseFloat(amountGiven),balance],(err,result)=>{
                 if(err)
                     console.log(err)
             })
@@ -285,7 +292,7 @@ app.get("/purchase/details/:id",(req,res)=>{
 })
 
 app.get("/credit/details",(req,res)=>{
-    const sqlGet = "SELECT tbl_sales.bill_id,tbl_customer.customerName, tbl_sales.date, tbl_sales.sales_amount, tbl_sales.sales_type, tbl_sales.balance, tbl_sales.salesStatus  FROM electric_shop.tbl_sales INNER JOIN electric_shop.tbl_customer ON electric_shop.tbl_sales.customer_id = tbl_customer.customer_id WHERE sales_type='Credit' AND salesStatus ='Pending'"
+    const sqlGet = "SELECT tbl_sales.bill_id,tbl_customer.customerName, tbl_sales.date, tbl_sales.sales_amount, tbl_sales.sales_type, tbl_sales.balance, tbl_sales.salesStatus  FROM electric_shop.tbl_sales INNER JOIN electric_shop.tbl_customer ON electric_shop.tbl_sales.customer_id = tbl_customer.customer_id WHERE sales_type='Credit'"
     db.query(sqlGet,(err,result)=>{
         if(err)
             console.log(err)
@@ -319,10 +326,93 @@ app.get("/get/supplierBalance/:id",(req,res)=>{
 })
 
 app.get("/get/salesDetails",(req,res)=>{
-    const sqlGet = "SELECT tbl_sales.bill_id, tbl_customer.customerName, tbl_sales.date,tbl_sales.sales_amount,tbl_sales.sales_type,tbl_sales.balance FROM tbl_sales INNER JOIN tbl_customer ON tbl_sales.customer_id = tbl_customer.customer_id"
+    const sqlGet = "SELECT tbl_sales.bill_id, tbl_customer.customerName, tbl_sales.date,tbl_sales.sales_amount,tbl_sales.sales_type,tbl_sales.amountGiven,tbl_sales.balance FROM tbl_sales INNER JOIN tbl_customer ON tbl_sales.customer_id = tbl_customer.customer_id"
     db.query(sqlGet,(err,result)=>{
         if(err)
             console.log(err)
         res.send(result)
     })
 })
+
+app.get("/return/details/:id",(req,res)=>{
+    const{id} = req.params
+    const sqlGet = "SELECT tbl_product.productName,tbl_product.stock, tbl_sales_product.product_id,tbl_sales_product.quantity, tbl_sales_product.price FROM tbl_sales_product INNER JOIN tbl_product ON tbl_product.product_id = tbl_sales_product.product_id WHERE bill_id = ?";
+    db.query(sqlGet,id,(err,result)=>{
+        if(err)
+            console.log(err)
+        res.send(result)
+    })
+})
+
+app.post("/return/products",(req,res)=>{
+    const{bill_id,data,returnAmount,remainBalance,sales} = req.body;
+    const sqlDelete = "DELETE FROM tbl_sales_product WHERE bill_id = ?";
+    db.query(sqlDelete,bill_id,(err,result)=>{
+        if(err)
+            console.log(err)
+        for(let i =0 ;i<data.length;i++){
+            let rQ = parseInt(data[i].returnQty);
+            let q = parseInt(data[i].quantity);
+            let stock = parseInt(data[i].stock);
+            if((q-rQ)!==0){
+                const sqlInsert = "INSERT INTO tbl_sales_product(bill_id,product_id,quantity,price)VALUES(?,?,?,?)"
+                db.query(sqlInsert, [bill_id,parseInt(data[i].product_id),parseInt(q-rQ),parseFloat(data[i].price)],(err,result)=>{
+                    if(err) console.log(err)
+                })
+            }
+            const sqlProduct = "UPDATE tbl_product SET stock=? WHERE product_id=?";
+            db.query(sqlProduct,[(stock+rQ),data[i].product_id],(err,result)=>{
+                if(err) console.log(err)
+            })
+        }
+        let balance = sales.balance;
+        let salesStatus=""
+        if(balance !== 0){
+            if(balance-returnAmount <= 0){
+                balance = 0
+                salesStatus = "Closed"
+            }
+            else{
+                balance = parseFloat(balance-returnAmount)
+                salesStatus="Pending"    
+            }
+        }
+        else{
+            salesStatus="Closed"
+        }
+        const sqlUpdate = "UPDATE tbl_sales SET sales_amount=?, balance=?,salesStatus=? WHERE bill_id = ?";
+        db.query(sqlUpdate,[remainBalance,balance,salesStatus,bill_id],(err,result)=>{
+            if(err)
+                console.log(err)
+        })
+    })
+})
+
+app.post("/update/creditBalance",(req,res)=>{
+    const {id,balance,amountGiven,remaining} = req.body;
+    const sqlPost = "INSERT INTO tbl_credit_return (bill_id, date, beforePay, amountGiven, afterPay) VALUES (?,CURDATE(),?,?,?)";
+    db.query(sqlPost,[id,balance,amountGiven,parseFloat(remaining)],(err,result)=>{
+        if(err)
+            console.log(err)
+        let salesStatus = "Pending"
+        if((balance-amountGiven) <=0)
+            salesStatus = "Closed"
+        const sqlUpdate = "UPDATE tbl_sales SET balance = ?, salesStatus=? where bill_id = ?";
+        db.query(sqlUpdate,[remaining,salesStatus,id],(err,result)=>{
+            if(err)
+                console.log(err)
+        })
+    })
+})
+
+app.get("/get/creditBalance/:id",(req,res)=>{
+    const {id} = req.params;
+    const sqlGet = "SELECT * FROM tbl_credit_return WHERE bill_id=?";
+    db.query(sqlGet,id,(err,result)=>{
+        if(err)
+            console.log(err)
+        res.send(result)
+
+    })
+})
+

@@ -103,7 +103,7 @@ const Datatable = ({page, row, column, loadData}) => {
                     </div>
                   )}
                 </Popup>
-                <Link to = {`${pathLink}/returnData/${params.row.supplier_id}`}>
+                <Link to = {`${pathLink}/returnData/${params.row.supplier_id}`} state={{name:params.row.supplierName}}>
                   <div className="purchaseButton">
                     View Return Data
                   </div>

@@ -20,11 +20,12 @@ import Report from "./pages/report/Report";
 import React from 'react'
 import Credit from "./pages/Credit/Credit";
 import SupplierReturn from "./pages/supplierReturn/SupplierReturn";
+import ReturnProduct from "./pages/returnProduct/ReturnProduct";
+import CreditReturn from "./pages/creditReturn/CreditReturn";
 
 
 
 function App() {
-
   const {darkMode} = useContext(DarkModeContext)
   const [customers, setCustomers] = useState([])
   const [products, setProducts] = useState([])
@@ -52,6 +53,7 @@ function App() {
     setProducts(response.data)
   },[setProducts])
 
+  
   useEffect(()=>{
     loadCustomer();
   },[loadCustomer])
@@ -84,9 +86,10 @@ function App() {
             <Route path='sales'>
               <Route index element = {<Sales customer={customers} categories={categories} products={products} />} />
               <Route path="invoice" element={<Invoice/>}/>
+              <Route path="return/:bill_id" element={<ReturnProduct />} />
             </Route> 
             <Route path="product">
-              <Route index element={<List page={"Product"} row={products} column={productColumns}/>} />
+              <Route index element={<List page={"Product"} row={products} column={productColumns} loadData={loadProduct}/>} />
               <Route path='view/:id' element={<Single/>}/>
               <Route path="new" element={<New inputs={productInputs} type="product" title="Product" category={categories} supplier={suppliers}/>}/>
             </Route>
@@ -101,6 +104,7 @@ function App() {
             <Route path = "report" element={<Report />} />
             <Route path = "notification" element={<Notifications />} />
             <Route path = "credit" element={<Credit />} />
+            <Route path = "creditReturn/:billId" element={<CreditReturn/>} />
           </Route>
         </Routes>
       </BrowserRouter>

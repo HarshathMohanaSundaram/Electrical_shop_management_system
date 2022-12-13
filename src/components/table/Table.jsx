@@ -6,29 +6,11 @@ import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
-import { useEffect } from "react";
-import { useCallback } from "react";
-import { useState } from "react";
 import React from 'react'
 
-import axios from "axios";
 
 
-
-const List = () => {
-  const [data,setData] = useState([])
-
-  const loadSales  = useCallback(async()=>{
-      const response = await axios.get("http://localhost:5000/last5Sales")
-      for(let i=0;i<response.data.length;i++){
-        response.data[i].date = response.data[i].date.split("T1")[0];
-      }
-      setData(response.data);
-    },[setData])
-
-  useEffect(()=>{
-    loadSales();
-  },[loadSales])
+const List = ({data}) => {
   
   return (
     <TableContainer component={Paper} className='table'>
